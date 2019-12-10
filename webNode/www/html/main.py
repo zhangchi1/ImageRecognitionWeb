@@ -1,7 +1,9 @@
 from flask import render_template
+from flask import request
 from flask import Flask
 import socket
 import time
+import requests
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
@@ -11,17 +13,6 @@ import time
 # # read image as bytes
 # file = img.read()
 # fileSize = len(file)
-
-# =============================================================================
-# Statistics Fields
-# =============================================================================
-RTT = 0 # unit s
-throughput = 0 # unit bits/s
-# =============================================================================
-# Classification Label Fields
-# =============================================================================
-labels = ['' for i in range(5)] # get top 5 labels
-probability = [0.0 for i in range(5)] # top 5 label's probabilities
 
 def requestLabelsFromServer(file):
     # Create a TCP/IP socket
@@ -70,9 +61,10 @@ def requestLabelsFromServer(file):
             print('Sending image to server with type', type(file))
             startTime = time.time()
             clientSocket.send(file)
+            
             getLabelRsp = clientSocket.recv(4096)
             RTT = time.time() - startTime
-            throughput = fileSize + len(getLabelRsp)
+            throughput = (fileSize + len(getLabelRsp))/RTT
             #TODO: process label text
             # Print statistics
             print(getLabelRsp)
@@ -87,32 +79,36 @@ def requestLabelsFromServer(file):
 
 
 # TODO: send RTT, throughput, file size, labels back to HTML
-RTT = 0
-throughput = 1
-fileSize = 1
-labels = ['a','b','c','d','e']
-probability = [0.8,0.7,0.6,0.4,0.3]
 app = Flask(__name__)
-@app.route('/mainPage.html')
-def getLabels(RTT=0, throughput=1, fileSize=1, labels = ['a','b','c'],probability = [0.8,0.7,0.6]):
-    return render_template('mainPage.html',
-                           RTT=RTT,
-                           throughput=throughput,
-                           fileSize=fileSize,
-                           labels=labels,
-                           probability=probability)
 
+@app.route('/mainPage', methods = ['GET'])
+def render():
+    print('******** In render Func *********')
+    return render_template('mainPage.html')
 
-
-@app.route('/mainPage', methods = ['POST'])
+@app.route('/imageProcess', methods = ['POST'])
 def imageProcess():
-    image=request.files['file']
-    print(len(image))
+    image=request.data
+    print(image)
+    print('Image size: ',len(image))
+
+    img = open('img1.JPG', 'rb')
+    file = img.read()
+    fileSize = len(file)
+    print(file)
+    print('fileSize', fileSize)
+
+    dic = {}
+    dic['result'] = 'OK'
+    dic['updatedImage'] = 'apple'
+    return dic
 
 
 if __name__ == "__main__":
     # TODO: read image from HTML
-    # app.run()
+    app.run(host='128.163.232.71', port=80)
+
+
     # test
     img = open('img1.JPG', 'rb')
     file = img.read()
