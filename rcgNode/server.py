@@ -56,7 +56,6 @@ while True:
                         sock.shutdown(socket.SHUT_RDWR)
                     else :
                         print("Image received")
-                        print(data)
                         imgcounter += 1
 
                         # Write the image to disk for buffering
@@ -82,14 +81,6 @@ while True:
                         serialized_dict = image_recognition(basename % imgcounter)
                         sock.sendall(serialized_dict.encode(encoding='utf-8'))
 
-                        # Wait for response from the client
-                        # data = sock.recv(4096)
-                        # rsp = str(data)[2:-1]
-                        # print(rsp)
-
-                        # Shut down the connection
-                        # print("Transfer complete, shutting down connection")
-                        # sock.shutdown(socket.SHUT_RDWR)
             except socket.error as error:
                 print(error)
                 sock.close()
