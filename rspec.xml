@@ -1,0 +1,50 @@
+<rspec xmlns="http://www.geni.net/resources/rspec/3" xmlns:emulab="http://www.protogeni.net/resources/rspec/ext/emulab/1" xmlns:tour="http://www.protogeni.net/resources/rspec/ext/apt-tour/1" xmlns:jacks="http://www.protogeni.net/resources/rspec/ext/jacks/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.geni.net/resources/rspec/3    http://www.geni.net/resources/rspec/3/request.xsd" type="request">
+  <node xmlns:emulab="http://www.protogeni.net/resources/rspec/ext/emulab/1" client_id="RecogNode" component_manager_id="urn:publicid:IDN+lan.sdn.uky.edu+authority+cm" component_id="urn:publicid:IDN+lan.sdn.uky.edu+node+pc2" sliver_id="urn:publicid:IDN+lan.sdn.uky.edu+sliver+24618" exclusive="false">
+    <icon xmlns="http://www.protogeni.net/resources/rspec/ext/jacks/1" url="https://portal.geni.net/images/VM-noTxt-centered.svg"/>
+    <sliver_type name="emulab-xen">
+      <disk_image name="urn:publicid:IDN+emulab.net+image+emulab-ops:UBUNTU14-64-STD"/>
+    </sliver_type>
+    <services>
+      <login authentication="ssh-keys" hostname="pcvm2-11.lan.sdn.uky.edu" port="22" username="psohal"/>
+      <login authentication="ssh-keys" hostname="pcvm2-11.lan.sdn.uky.edu" port="22" username="czhang1"/>
+      <login authentication="ssh-keys" hostname="pcvm2-11.lan.sdn.uky.edu" port="22" username="matta"/>
+      <login authentication="ssh-keys" hostname="pcvm2-11.lan.sdn.uky.edu" port="22" username="zhudi"/>
+      <emulab:console server="vhost2.shared-nodes.emulab-ops.lan.sdn.uky.edu"/>
+    </services>
+    <interface client_id="interface-0" component_id="urn:publicid:IDN+lan.sdn.uky.edu+interface+pc2:lo0" sliver_id="urn:publicid:IDN+lan.sdn.uky.edu+sliver+24622" mac_address="02ecc1488d59">
+      <ip address="192.168.1.201" type="ipv4" netmask="255.255.255.0"/>
+    </interface>
+    <routable_control_ip xmlns="http://www.protogeni.net/resources/rspec/ext/emulab/1"/>
+    <emulab:vnode name="pcvm2-11" hardware_type="pcvm"/>
+    <host name="RecogNode.finalProject.ch-geni-net.lan.sdn.uky.edu" ipv4="128.163.232.64"/>
+  </node>
+  <node xmlns:emulab="http://www.protogeni.net/resources/rspec/ext/emulab/1" client_id="webNode" component_manager_id="urn:publicid:IDN+lan.sdn.uky.edu+authority+cm" component_id="urn:publicid:IDN+lan.sdn.uky.edu+node+pc2" sliver_id="urn:publicid:IDN+lan.sdn.uky.edu+sliver+24619" exclusive="false">
+    <icon xmlns="http://www.protogeni.net/resources/rspec/ext/jacks/1" url="https://portal.geni.net/images/VM-noTxt-centered.svg"/>
+    <sliver_type name="emulab-xen">
+      <disk_image name="urn:publicid:IDN+emulab.net+image+emulab-ops:UBUNTU14-64-STD"/>
+    </sliver_type>
+    <services>
+      <login authentication="ssh-keys" hostname="pcvm2-12.lan.sdn.uky.edu" port="22" username="psohal"/>
+      <login authentication="ssh-keys" hostname="pcvm2-12.lan.sdn.uky.edu" port="22" username="czhang1"/>
+      <login authentication="ssh-keys" hostname="pcvm2-12.lan.sdn.uky.edu" port="22" username="matta"/>
+      <login authentication="ssh-keys" hostname="pcvm2-12.lan.sdn.uky.edu" port="22" username="zhudi"/>
+      <emulab:console server="vhost2.shared-nodes.emulab-ops.lan.sdn.uky.edu"/>
+    </services>
+    <interface client_id="interface-1" component_id="urn:publicid:IDN+lan.sdn.uky.edu+interface+pc2:lo0" sliver_id="urn:publicid:IDN+lan.sdn.uky.edu+sliver+24623" mac_address="0236fa92c70e">
+      <ip address="192.168.1.200" type="ipv4" netmask="255.255.255.0"/>
+    </interface>
+    <routable_control_ip xmlns="http://www.protogeni.net/resources/rspec/ext/emulab/1"/>
+    <emulab:vnode name="pcvm2-12" hardware_type="pcvm"/>
+    <host name="webNode.finalProject.ch-geni-net.lan.sdn.uky.edu" ipv4="128.163.232.71"/>
+  </node>
+  <link client_id="link-0" sliver_id="urn:publicid:IDN+lan.sdn.uky.edu+sliver+24621">
+    <interface_ref client_id="interface-0" component_id="urn:publicid:IDN+lan.sdn.uky.edu+interface+pc2:lo0" sliver_id="urn:publicid:IDN+lan.sdn.uky.edu+sliver+24622"/>
+    <interface_ref client_id="interface-1" component_id="urn:publicid:IDN+lan.sdn.uky.edu+interface+pc2:lo0" sliver_id="urn:publicid:IDN+lan.sdn.uky.edu+sliver+24623"/>
+    <component_manager name="urn:publicid:IDN+lan.sdn.uky.edu+authority+cm"/>
+    <property xmlns="http://www.geni.net/resources/rspec/3" source_id="interface-0" dest_id="interface-1" capacity="1000000"/>
+    <property xmlns="http://www.geni.net/resources/rspec/3" source_id="interface-1" dest_id="interface-0" capacity="1000000"/>
+  </link>
+  <rs:site_info xmlns:rs="http://www.protogeni.net/resources/rspec/ext/site-info/1">
+    <rs:location country="" latitude=" 38.039324" longitude="-84.498135"/>
+  </rs:site_info>
+</rspec>
