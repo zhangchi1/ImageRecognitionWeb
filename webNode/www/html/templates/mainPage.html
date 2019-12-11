@@ -31,48 +31,35 @@
         After uploading the image, click the Classify Image button to assign labels
     </h5>
     <input id="imageSrc" class="upload_image" type="file" onchange="previewFile.call(this)">
-    <button id="ClassifyImage">Classify Image</button>
     <button id="upload" onclick="uploadFile.call(this)">Upload</button>
-    <!--remove the download button, use save button as a single click to save and download-->
-    <!--<button download="info.txt" id="downloadlink">Download</button>-->
 
     <div class="row">
         <div class="col-lg-7">
             <img class="preview_image" src="" style="display:none" width="600px" height="400px" id="image"/>
         </div>
-        <div class="col-lg-5" style="border: 1px solid gray; max-height: 300px;">
-            <div class="left" style="border: 1px solid gray; max-height: 300px;">
-                <ul id="listOfResult">
-                    <li>0.</li>
-                    <li>1. </li>
-                    <li>2. </li>
-                    <li>3. </li>
-                    <li>4. </li>
-                </ul>
+        <div class="col-lg-5">
+            <div id="result">
             </div>
-            <div class="right">
-                <ul id="imagePoints" style="max-height: 275px; overflow: -webkit-paged-x;"
-                    data-columns="1">
-                </ul>
-            </div>
+
         </div>
 
     </div>
     <canvas id="canvas" width="600px" height="400px" style="padding-top:20px;padding-bottom:20px"></canvas>
     <div id="extra-info"></div>
+    <style>
+        table td {
+            border: 1px solid;
+            padding: 5px;
+        }
+    </style>
 </div>
 
 <!--Functions-->
 <script>
-    var personIndex = 0;
-    var bodyIndex = 0;
-    var bodyPoints = 13;
     var myCanvas = $("#canvas");
     var myCanvasContext = myCanvas[0].getContext("2d");
     var canvasImage = document.getElementById("image");
-    //connect to local python backend
     var server = "http://128.163.232.71:80";
-
 
     function previewFile() {
         myCanvasContext.drawImage(document.getElementById("image"), 0, 0, 600, 400);
@@ -91,66 +78,76 @@
         var input = document.getElementById('imageSrc');
         var file = input.files[0];
         fr = new FileReader();
-        fr.onload = receivedText;
+        console.log("===========After file reader=========");
+        fr.onload = function() {
+            var imageBase64 = fr.result.split(',')[1];
+            imageProcessing(imageBase64);
+        };
         fr.readAsDataURL(file);
-    }
-
-    function receivedText() {
-        var b64Data = fr.result.split(',');
-        var contentType = 'image/jpeg';
-        var byteCharacters = atob(b64Data[1]);
-        var byteNumbers = Array.prototype.map.call(byteCharacters,
-                                       charCodeFromCharacter);
-        var uint8Data = new Uint8Array(byteNumbers);
-        var blob = b64toBlob(b64Data[1], contentType);
     }
 
     function charCodeFromCharacter(c) {
          return c.charCodeAt(0);
     }
 
-    function b64toBlob(b64Data, contentType, sliceSize) {
-        contentType = contentType || '';
-        sliceSize = sliceSize || 1024;
-        var byteCharacters = atob(b64Data);
-        var byteArrays = [];
-
-        for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-            var slice = byteCharacters.slice(offset, offset + sliceSize);
-            var byteNumbers = Array.prototype.map.call(slice, charCodeFromCharacter);
-            var byteArray = new Uint8Array(byteNumbers);
-            byteArrays.push(byteArray);
-        }
-        console.log(byteArray);
-        var appdir='/imageProcess';
-        var data = {"file": byteArray};
+    function imageProcessing(base64String) {
+        var appdir= '/imageProcess';
+        var data = {"file": base64String};
         $.ajax({
             url: server + appdir,
             type: 'POST',
             data: JSON.stringify(data),
             dataType: 'json',
             contentType: "application/json; charset=utf-8",
-
             success: function (response) {
-                console.log(response);
-                if (response.result == "OK") {
-                    var apple = response.updatedImage;
-                    console.log(apple);
-                    $('#listOfResult').text(apple);
+                // console.log(response);
+                if (response.resultMsg == "ReceivedLabels") {
+                    var RTT = response.RTT;
+                    var throughput = response.throughput;
+                    var labels = response.labels;
+                    var probability = response.probability;
+                    buildTable(RTT, throughput, labels, probability);
+                    alert('Successfully Uploaded the Image!');
+                    // for (i=0;i<labels.length;i++) {
+                    //     $('#listOfResult').append('<li>'+ ' Label'+(i+1)+': '+labels[i]+ ' Probability: ' + probability[i] +'</li>>');
+                    // }
+                    // $('#listOfResult').append('<li>'+ 'RTT: '+ RTT+ ' seconds' +'</li>>');
+                    // $('#listOfResult').append('<li>'+ 'Throughput: ' + throughput + ' bytes/s'+ '</li>>');
+
                 } else {
-                    alert('file not uploaded');
+                    alert('No Label Results from the Server! / Image Too Large!');
                 }
             },
             error: function() {
-                alert('file not uploaded');
+                alert('File Not Uploaded / Image Too Large');
             }
         });
-
     }
 
+    function buildTable(RTT, throughput, labels, probability) {
+        var tableTemplate = '<div><h1 style="font-weight: bold; font-size:20px;">Result:</h1><p>RTT: ' + RTT +
+            ' seconds' +'</p>' + '<p>Throughput: ' + throughput +' bytes/s' +'</p>';
+        tableTemplate += '<table style="border: 1px solid gray; max-height: 600px; width: 100%">' +
+            '  <tr>\n' +
+            '    <td>Probability</td>';
 
+        for (var n = 0; n < probability.length; n++) {
+           tableTemplate += '<td>' + probability[n] + '</td>';
+        }
+
+        tableTemplate += '</tr>';
+        tableTemplate += '<tr>' +
+            '    <td>Label</td>';
+
+        for (var n = 0; n < labels.length; n++) {
+           tableTemplate += '<td>' + labels[n] + '</td>';
+        }
+
+        tableTemplate += '</tr></table>';
+        var currentDiv = $('#result');
+        currentDiv.html(tableTemplate);
+    }
 </script>
-
 
 </body>
 </html>
